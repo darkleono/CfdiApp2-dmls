@@ -1,6 +1,6 @@
-const convert = require("xml-js");
-const soapRequest = require("easy-soap-request");
-const { url, headers, xml, errors } = require("../../const");
+const convert = require('xml-js');
+const soapRequest = require('easy-soap-request');
+const { url, headers, xml, errors } = require('../../const');
 
 async function validateCfdi(values) {
   try {
