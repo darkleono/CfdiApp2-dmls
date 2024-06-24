@@ -1,5 +1,7 @@
 const cfdiForm = document.getElementById('cfdi-form');
 const cfdiResults = document.getElementById('cfdi-results');
+const uploadInput = document.getElementById('upload-xml');
+const processButton = document.getElementById('process-xml');
 
 // Manejo del cambio de tema
 const themeToggle = document.getElementById('theme-toggle');
@@ -21,23 +23,14 @@ themeToggle.addEventListener('click', () => {
   resultsElements.forEach(results => results.classList.toggle('dark'));
 });
 
-cfdiForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
+// Manejo del cambio de pestaña
+$('.nav-tabs a').click(function (e) {
+  e.preventDefault();
+  $(this).tab('show');
+});
 
-  const rfc_emisor = document.getElementById('rfc_emisor').value;
-  const rfc_receptor = document.getElementById('rfc_receptor').value;
-  const total = document.getElementById('total').value;
-  const folio_fiscal = document.getElementById('folio_fiscal').value;
-
-  // Validación manual del total
-  if (!/^\d+\.\d{2}$/.test(total)) {
-    cfdiResults.innerHTML = `
-      <h3>Error:</h3>
-      <p>El total debe ser un número decimal con dos decimales.</p>
-    `;
-    return;
-  }
-
+// Función para validar el CFDI con la API (usando datos del formulario)
+async function validarCFDIDatos(rfc_emisor, rfc_receptor, total, folio_fiscal) {
   try {
     const response = await fetch('/api/status', {
       method: 'POST',
@@ -76,5 +69,79 @@ cfdiForm.addEventListener('submit', async (event) => {
       <h3>Error:</h3>
       <p>${error.message}</p>
     `;
+  }
+}
+
+// Manejo del formulario
+cfdiForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const rfc_emisor = document.getElementById('rfc_emisor').value;
+  const rfc_receptor = document.getElementById('rfc_receptor').value;
+  const total = document.getElementById('total').value;
+  const folio_fiscal = document.getElementById('folio_fiscal').value;
+
+  // Validación manual del total
+  if (!/^\d+\.\d{2}$/.test(total)) {
+    cfdiResults.innerHTML = `
+      <h3>Error:</h3>
+      <p>El total debe ser un número decimal con dos decimales.</p>
+    `;
+    return;
+  }
+
+  // Llamar a la función para validar el CFDI
+  validarCFDIDatos(rfc_emisor, rfc_receptor, total, folio_fiscal);
+});
+
+// Manejo de la carga del archivo XML
+processButton.addEventListener('click', async () => {
+  const file = uploadInput.files[0];
+
+  if (file) {
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const xmlContent = e.target.result;
+
+        try {
+          // Enviar el contenido XML como texto plano
+          const response = await fetch('/api/validar-xml', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'text/xml' // Importante: Especificar el tipo de contenido
+            },
+            body: xmlContent
+          });
+
+          if (!response.ok) {
+            throw new Error(`Error en la solicitud: ${response.status}`);
+          }
+
+          const data = await response.json();
+
+          // Mostrar la respuesta del servidor
+          cfdiResults.innerHTML = `
+            <h3>Respuesta del servidor:</h3>
+            <pre>${JSON.stringify(data, null, 2)}</pre>
+          `;
+
+        } catch (error) {
+          cfdiResults.innerHTML = `
+            <h3>Error:</h3>
+            <p>${error.message}</p>
+          `;
+        }
+      };
+      reader.readAsText(file);
+
+    } catch (error) {
+      cfdiResults.innerHTML = `
+        <h3>Error:</h3>
+        <p>${error.message}</p>
+      `;
+    }
+  } else {
+    cfdiResults.innerHTML = '<p>Por favor, selecciona un archivo XML.</p>';
   }
 });
