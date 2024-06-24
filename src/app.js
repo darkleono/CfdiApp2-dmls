@@ -15,7 +15,7 @@ app.get("/", (req, res) => {
 // Rutas de la API
 app.use("/api", apiRoutes);
 
-const PORT = process.env.PORT || 3500;
+const PORT = process.env.PORT || 3600;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
