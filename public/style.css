@@ -1,50 +1,123 @@
 body {
-    font-family: sans-serif;
-  }
-  
-  .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
-  .form-container {
-    border: 1px solid #ccc;
-    padding: 20px;
-    border-radius: 5px;
-  }
-  
-  h2 {
-    margin-bottom: 10px;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 5px;
-  }
-  
-  input[type="text"],
-  input[type="number"] {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-  }
-  
-  button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-  }
-  
-  .results {
-    margin-top: 20px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
+  font-family: sans-serif;
+  background-color: #f0f0f0; /* Fondo claro */
+  color: #333; /* Texto oscuro */
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.form-container {
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 5px;
+  background-color: #fff; /* Fondo claro */
+  width: 400px; /* Ancho del formulario */
+  margin: 0 auto; /* Centrar el formulario */
+}
+
+h2 {
+  margin-bottom: 10px;
+  color: #333; /* Texto oscuro */
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333; /* Texto oscuro */
+}
+
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: #fff; /* Fondo claro */
+  color: #333; /* Texto oscuro */
+  display: block; /* Asegura que el campo ocupe todo el ancho */
+  margin: 0 auto;  /* Centrar horizontalmente */
+}
+
+button {
+  background-color: #4CAF50; /* Verde */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.results {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff; /* Fondo claro */
+}
+
+/* Centrar el botón "Validar" */
+.form-container button {
+  display: block;
+  margin: 0 auto;
+  width: 150px; /* Ancho del botón */
+}
+
+/* Estilos para el botón "Cambiar Tema" */
+#theme-toggle {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  color: #333; /* Color del texto del botón en modo claro */
+  z-index: 100; /* Asegura que el botón esté por encima de otros elementos */
+}
+
+/* Icono de luna/sol para el botón */
+#theme-toggle::before {
+  content: '\f186'; /* Icono de luna (fuente Font Awesome) */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+}
+
+#theme-toggle.dark::before {
+  content: '\f185'; /* Icono de sol (fuente Font Awesome) */
+}
+
+/* Estilos para modo oscuro */
+body.dark {
+  background-color: #222; /* Fondo oscuro */
+  color: #eee; /* Texto claro */
+}
+
+.form-container.dark {
+  background-color: #333; /* Fondo oscuro */
+}
+
+h2.dark,
+label.dark {
+  color: #eee; /* Texto claro */
+}
+
+input[type="text"].dark,
+input[type="number"].dark {
+  background-color: #333; /* Fondo oscuro */
+  color: #eee; /* Texto claro */
+}
+
+button.dark {
+  background-color: #2196F3; /* Azul */
+}
+
+.results.dark {
+  background-color: #333; /* Fondo oscuro */
+}

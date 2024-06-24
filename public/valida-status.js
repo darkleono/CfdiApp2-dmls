@@ -1,6 +1,26 @@
 const cfdiForm = document.getElementById('cfdi-form');
 const cfdiResults = document.getElementById('cfdi-results');
 
+// Manejo del cambio de tema
+const themeToggle = document.getElementById('theme-toggle');
+const body = document.body;
+const formContainer = document.querySelector('.form-container');
+const h2Elements = document.querySelectorAll('h2');
+const labelElements = document.querySelectorAll('label');
+const inputElements = document.querySelectorAll('input');
+const buttonElements = document.querySelectorAll('button');
+const resultsElements = document.querySelectorAll('.results');
+
+themeToggle.addEventListener('click', () => {
+  body.classList.toggle('dark');
+  formContainer.classList.toggle('dark');
+  h2Elements.forEach(h2 => h2.classList.toggle('dark'));
+  labelElements.forEach(label => label.classList.toggle('dark'));
+  inputElements.forEach(input => input.classList.toggle('dark'));
+  buttonElements.forEach(button => button.classList.toggle('dark'));
+  resultsElements.forEach(results => results.classList.toggle('dark'));
+});
+
 cfdiForm.addEventListener('submit', async (event) => {
   event.preventDefault();
 
