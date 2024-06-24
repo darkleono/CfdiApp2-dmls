@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valida Estatus de CFDI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="form-container">
+      <h2>Valida Estatus de CFDI</h2>
+      <form id="cfdi-form">
+        <label for="rfc_emisor">RFC Emisor:</label>
+        <input type="text" id="rfc_emisor" name="rfc_emisor" required>
+
+        <label for="rfc_receptor">RFC Receptor:</label>
+        <input type="text" id="rfc_receptor" name="rfc_receptor" required>
+
+        <label for="total">Total:</label>
+        <input type="text" id="total" name="total" required>
+
+        <label for="folio_fiscal">Folio Fiscal:</label>
+        <input type="text" id="folio_fiscal" name="folio_fiscal" required>
+
+        <button type="submit">Validar</button>
+      </form>
+
+      <div class="results" id="cfdi-results"></div>
+    </div>
+  </div>
+
+  <script src="valida-status.js"></script> 
+</body>
+</html>
