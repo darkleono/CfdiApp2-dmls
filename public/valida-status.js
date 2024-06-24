@@ -7,26 +7,21 @@ const processButton = document.getElementById('process-xml');
 const themeToggle = document.getElementById('theme-toggle');
 const body = document.body;
 const formContainer = document.querySelector('.form-container');
-const h2Elements = document.querySelectorAll('h2');
-const labelElements = document.querySelectorAll('label');
-const inputElements = document.querySelectorAll('input');
-const buttonElements = document.querySelectorAll('button');
-const resultsElements = document.querySelectorAll('.results');
+const elementsToToggle = [
+  body, formContainer, ...document.querySelectorAll('h2, label, input, button, .results')
+];
 
 themeToggle.addEventListener('click', () => {
-  body.classList.toggle('dark');
-  formContainer.classList.toggle('dark');
-  h2Elements.forEach(h2 => h2.classList.toggle('dark'));
-  labelElements.forEach(label => label.classList.toggle('dark'));
-  inputElements.forEach(input => input.classList.toggle('dark'));
-  buttonElements.forEach(button => button.classList.toggle('dark'));
-  resultsElements.forEach(results => results.classList.toggle('dark'));
+  elementsToToggle.forEach(element => element.classList.toggle('dark'));
 });
 
 // Manejo del cambio de pestaña
 $('.nav-tabs a').click(function (e) {
   e.preventDefault();
   $(this).tab('show');
+  
+  // Limpiar resultados al cambiar de pestaña
+  limpiarResultados();
 });
 
 // Función para validar el CFDI con la API (usando datos del formulario)
@@ -57,19 +52,34 @@ async function validarCFDIDatos(rfc_emisor, rfc_receptor, total, folio_fiscal) {
     const codigoEstatus = data["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:CodigoEstatus"]["_text"];
     const estatusCancelacion = data["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:EstatusCancelacion"]["_text"];
 
-    cfdiResults.innerHTML = `
-      <h3>Resultados:</h3>
-      <p><strong>Estado:</strong> ${estado}</p>
-      <p><strong>Cancelable:</strong> ${cancelable}</p>
-      <p><strong>Código de Estatus:</strong> ${codigoEstatus}</p>
-      ${cancelable !== 'Cancelable con aceptación' ? `<p><strong>Estatus de Cancelación:</strong> ${estatusCancelacion || 'No disponible'}</p>` : ''}
-    `;
+    mostrarResultado(estado, cancelable, codigoEstatus, estatusCancelacion);
   } catch (error) {
-    cfdiResults.innerHTML = `
-      <h3>Error:</h3>
-      <p>${error.message}</p>
-    `;
+    mostrarError(error.message);
   }
+}
+
+// Función para mostrar resultados
+function mostrarResultado(estado, cancelable, codigoEstatus, estatusCancelacion) {
+  cfdiResults.innerHTML = `
+    <h3>Resultados:</h3>
+    <p><strong>Estado:</strong> ${estado}</p>
+    <p><strong>Cancelable:</strong> ${cancelable}</p>
+    <p><strong>Código de Estatus:</strong> ${codigoEstatus}</p>
+    ${cancelable !== 'Cancelable con aceptación' ? `<p><strong>Estatus de Cancelación:</strong> ${estatusCancelacion || 'No disponible'}</p>` : ''}
+  `;
+}
+
+// Función para mostrar mensaje de error
+function mostrarError(mensaje) {
+  cfdiResults.innerHTML = `
+    <h3>Error:</h3>
+    <p>${mensaje}</p>
+  `;
+}
+
+// Función para limpiar resultados
+function limpiarResultados() {
+  cfdiResults.innerHTML = '';
 }
 
 // Manejo del formulario
@@ -83,12 +93,12 @@ cfdiForm.addEventListener('submit', async (event) => {
 
   // Validación manual del total
   if (!/^\d+\.\d{2}$/.test(total)) {
-    cfdiResults.innerHTML = `
-      <h3>Error:</h3>
-      <p>El total debe ser un número decimal con dos decimales.</p>
-    `;
+    mostrarError('El total debe ser un número decimal con dos decimales.');
     return;
   }
+
+  // Limpiar resultados previos
+  limpiarResultados();
 
   // Llamar a la función para validar el CFDI
   validarCFDIDatos(rfc_emisor, rfc_receptor, total, folio_fiscal);
@@ -120,28 +130,24 @@ processButton.addEventListener('click', async () => {
 
           const data = await response.json();
 
-          // Mostrar la respuesta del servidor
-          cfdiResults.innerHTML = `
-            <h3>Respuesta del servidor:</h3>
-            <pre>${JSON.stringify(data, null, 2)}</pre>
-          `;
+          // Extraer los datos relevantes 
+          const estado = data["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:Estado"]["_text"];
+          const cancelable = data["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:EsCancelable"]["_text"];
+          const codigoEstatus = data["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:CodigoEstatus"]["_text"];
+          const estatusCancelacion = data["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:EstatusCancelacion"]["_text"];
+
+          mostrarResultado(estado, cancelable, codigoEstatus, estatusCancelacion);
 
         } catch (error) {
-          cfdiResults.innerHTML = `
-            <h3>Error:</h3>
-            <p>${error.message}</p>
-          `;
+          mostrarError(error.message);
         }
       };
       reader.readAsText(file);
 
     } catch (error) {
-      cfdiResults.innerHTML = `
-        <h3>Error:</h3>
-        <p>${error.message}</p>
-      `;
+      mostrarError(error.message);
     }
   } else {
-    cfdiResults.innerHTML = '<p>Por favor, selecciona un archivo XML.</p>';
+    mostrarError('Por favor, selecciona un archivo XML.');
   }
 });
