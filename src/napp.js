@@ -7,13 +7,16 @@ const app = express();
 // Middleware para analizar JSON en el cuerpo de la solicitud
 app.use(express.json());
 
+// Middleware para analizar texto plano en el cuerpo de la solicitud, específicamente XML
+app.use(express.text({ type: 'application/xml' }));
+
 // Servir archivos estáticos con Content-Type correcto
 app.use(express.static(path.join(__dirname, '..', 'public'), {
-  setHeaders: function(res, path, stat) {
+  setHeaders: function (res, path) {
     if (path.endsWith('.css')) {
       res.setHeader('Content-Type', 'text/css');
     } else if (path.endsWith('.js')) {
-      res.setHeader('Content-Type', 'text/javascript');
+      res.setHeader('Content-Type', 'application/javascript');
     }
   }
 }));

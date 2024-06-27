@@ -18,22 +18,6 @@ app.use(express.static(path.join(__dirname, '..', 'public'), {
   }
 }));
 
-// Middleware para log de errores
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
-});
-
-// Middleware para log de datos recibidos en la llamada a la API
-app.use('/api', (req, res, next) => {
-  console.log(`API request received at ${new Date()}:`);
-  console.log(`Request Method: ${req.method}`);
-  console.log(`Request URL: ${req.originalUrl}`);
-  console.log(`Request Body:`);
-  console.log(req.body); // Log del cuerpo de la solicitud
-  next(); // Continuar con el siguiente middleware/ruta
-});
-
 // Página de bienvenida
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
