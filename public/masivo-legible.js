@@ -40,8 +40,17 @@ async function validateForm(event) {
 
 		const result = await response.json();
 
-		// Usar la función formatApiResponse para obtener el texto formateado
-		const resultadoTexto = formatApiResponse(result);
+		// Mostrar valores en renglones separados (sin encabezado)
+		const estado = result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:Estado"]["_text"];
+		const cancelable = result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:EsCancelable"]["_text"];
+		const codigoEstatus = result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:CodigoEstatus"]["_text"];
+		const estatusCancelacion = result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:EstatusCancelacion"]["_text"];
+
+		const resultadoTexto = `${estado}\n${cancelable}\n${codigoEstatus}\n${
+			cancelable !== "Cancelable con aceptación"
+				? `${estatusCancelacion || "No disponible"}\n`
+				: ""
+		}`;
 
 		document.getElementById("form-result").textContent =
 			resultadoTexto;
@@ -65,7 +74,7 @@ async function processXml() {
 		const response = await fetch("/api/validar-xml", {
 			method: "POST",
 			headers: {
-				"Content-Type": "text/xml",
+				"Content-Type": "text/xml", // Tipo de contenido corregido
 			},
 			body: xmlContent,
 		});
@@ -76,9 +85,23 @@ async function processXml() {
 
 		const result = await response.json();
 
-		// Usar la función formatApiResponse para obtener el texto formateado
-		const resultadoTexto = formatApiResponse(result);
-
+		// Mostrar resultado como texto plano
+		const resultadoTexto = `
+                Estado: ${result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:Estado"]["_text"]}
+                Cancelable: ${result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:EsCancelable"]["_text"]}
+                Código de Estatus: ${result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:CodigoEstatus"]["_text"]}
+                ${
+			result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"][
+				"a:EsCancelable"
+			]["_text"] !== "Cancelable con aceptación"
+				? `Estatus de Cancelación: ${
+						result["s:Envelope"]["s:Body"]["ConsultaResponse"][
+							"ConsultaResult"
+						]["a:EstatusCancelacion"]["_text"] || "No disponible"
+				  }`
+				: ""
+		}
+            `;
 		document.getElementById("xml-result").textContent =
 			resultadoTexto;
 	} catch (error) {
@@ -119,7 +142,7 @@ async function validateFolder() {
 			const response = await fetch("/api/validar-xml", {
 				method: "POST",
 				headers: {
-					"Content-Type": "text/xml", 
+					"Content-Type": "text/xml", // Tipo de contenido corregido
 				},
 				body: xmlContent,
 			});
@@ -127,29 +150,28 @@ async function validateFolder() {
 			if (!response.ok) {
 				throw new Error(`Error en la solicitud: ${response.status}`);
 			}
-
 			const result = await response.json();
 
-			// Usar la función formatApiResponse para obtener el texto formateado
-			const resultadoTexto = formatApiResponse(result);
-
+			// Mostrar resultado como texto plano
+			const resultadoTexto = `
+                Estado: ${result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:Estado"]["_text"]}
+                Cancelable: ${result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:EsCancelable"]["_text"]}
+                Código de Estatus: ${result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:CodigoEstatus"]["_text"]}
+                ${
+			result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"][
+				"a:EsCancelable"
+			]["_text"] !== "Cancelable con aceptación"
+				? `Estatus de Cancelación: ${
+						result["s:Envelope"]["s:Body"]["ConsultaResponse"][
+							"ConsultaResult"
+						]["a:EstatusCancelacion"]["_text"] || "No disponible"
+				  }`
+				: ""
+		}
+            `;
 			statusCell.textContent = resultadoTexto;
 		} catch (error) {
 			statusCell.textContent = "Error: " + error.message;
 		}
 	}
-}
-
-// Función reutilizable para formatear los resultados de la API
-function formatApiResponse(result) {
-	const estado = result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:Estado"]["_text"];
-	const cancelable = result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:EsCancelable"]["_text"];
-	const codigoEstatus = result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:CodigoEstatus"]["_text"];
-	const estatusCancelacion = result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:EstatusCancelacion"]["_text"];
-
-	return `${estado}\n${cancelable}\n${codigoEstatus}\n${
-		cancelable !== "Cancelable con aceptación"
-			? `${estatusCancelacion || "No disponible"}\n`
-			: ""
-	}`;
 }
