@@ -6,6 +6,33 @@ document.addEventListener("DOMContentLoaded", function () {
 	document
 		.getElementById("validate-folder")
 		.addEventListener("click", validateFolder);
+
+	// Agregar evento "change" al input de tipo "file" para el contador
+	const folderInput = document.getElementById("folder-files");
+	folderInput.addEventListener("change", function () {
+		const files = this.files;
+
+		let xmlCount = 0;
+		for (const file of files) {
+			if (file.type === "text/xml") {
+				xmlCount++;
+			}
+		}
+
+		// Mostrar contador en el HTML
+		const folderTab = document.getElementById("folder-tab");
+		const tablaArchivos = document.getElementById("folder-files-table");
+		const contadorElemento = folderTab.querySelector(".contador-xml");
+
+		if (contadorElemento) {
+			contadorElemento.textContent = `Archivos XML encontrados: ${xmlCount}`;
+		} else {
+			const nuevoContador = document.createElement("p");
+			nuevoContador.classList.add("contador-xml");
+			nuevoContador.textContent = `Archivos XML encontrados: ${xmlCount}`;
+			folderTab.insertBefore(nuevoContador, tablaArchivos);
+		}
+	});
 });
 
 function showTab(tabId) {
@@ -40,7 +67,6 @@ async function validateForm(event) {
 
 		const result = await response.json();
 
-		// Usar la función formatApiResponse para obtener el texto formateado
 		const resultadoTexto = formatApiResponse(result);
 
 		document.getElementById("form-result").textContent =
@@ -76,7 +102,6 @@ async function processXml() {
 
 		const result = await response.json();
 
-		// Usar la función formatApiResponse para obtener el texto formateado
 		const resultadoTexto = formatApiResponse(result);
 
 		document.getElementById("xml-result").textContent =
@@ -130,7 +155,6 @@ async function validateFolder() {
 
 			const result = await response.json();
 
-			// Usar la función formatApiResponse para obtener el texto formateado
 			const resultadoTexto = formatApiResponse(result);
 
 			statusCell.textContent = resultadoTexto;

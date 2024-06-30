@@ -39,8 +39,8 @@
 
   <section id="folder-tab" class="tab" style="display: none;">
     <h2>Validar Carpeta</h2>
-    <input type="file" id="folder-files" webkitdirectory directory multiple>
-    <button id="validate-folder">Validar Carpeta</button>
+    <input type="file" id="folder-files" webkitdirectory directory multiple style="display: none;"> 
+    <button onclick="document.getElementById('folder-files').click()">Seleccionar Carpeta</button> <button id="validate-folder">Validar Masivo</button>
     <table id="folder-files-table">
       <thead>
         <tr>
