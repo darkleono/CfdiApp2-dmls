@@ -22,23 +22,42 @@ async function validateForm(event) {
 		rfc_emisor: formData.get("rfcEmisor"),
 		rfc_receptor: formData.get("rfcReceptor"),
 		total: formData.get("total"),
-		folio_fiscal: formData.get("uuid"), // Usamos folio_fiscal para mantener la coherencia con la API
+		folio_fiscal: formData.get("uuid"),
 	};
 
-	const response = await fetch("/api/status", { // Usamos la ruta /api/status para validar por formulario
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(data),
-	});
+	try {
+		const response = await fetch("/api/status", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data),
+		});
 
-	const result = await response.json();
-	document.getElementById("form-result").textContent = JSON.stringify(
-		result,
-		null,
-		2,
-	);
+		if (!response.ok) {
+			throw new Error(`Error en la solicitud: ${response.status}`);
+		}
+
+		const result = await response.json();
+
+		// Mostrar valores en renglones separados (sin encabezado)
+		const estado = result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:Estado"]["_text"];
+		const cancelable = result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:EsCancelable"]["_text"];
+		const codigoEstatus = result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:CodigoEstatus"]["_text"];
+		const estatusCancelacion = result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:EstatusCancelacion"]["_text"];
+
+		const resultadoTexto = `${estado}\n${cancelable}\n${codigoEstatus}\n${
+			cancelable !== "Cancelable con aceptación"
+				? `${estatusCancelacion || "No disponible"}\n`
+				: ""
+		}`;
+
+		document.getElementById("form-result").textContent =
+			resultadoTexto;
+	} catch (error) {
+		document.getElementById("form-result").textContent =
+			"Error: " + error.message;
+	}
 }
 
 async function processXml() {
@@ -51,20 +70,44 @@ async function processXml() {
 	const file = fileInput.files[0];
 	const xmlContent = await file.text();
 
-	const response = await fetch("/api/validar-xml", { // Usamos la ruta /api/validar-xml para validar por archivo
-		method: "POST",
-		headers: {
-			"Content-Type": "text/xml", // Tipo de contenido corregido
-		},
-		body: xmlContent,
-	});
+	try {
+		const response = await fetch("/api/validar-xml", {
+			method: "POST",
+			headers: {
+				"Content-Type": "text/xml", // Tipo de contenido corregido
+			},
+			body: xmlContent,
+		});
 
-	const result = await response.json();
-	document.getElementById("xml-result").textContent = JSON.stringify(
-		result,
-		null,
-		2,
-	);
+		if (!response.ok) {
+			throw new Error(`Error en la solicitud: ${response.status}`);
+		}
+
+		const result = await response.json();
+
+		// Mostrar resultado como texto plano
+		const resultadoTexto = `
+                Estado: ${result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:Estado"]["_text"]}
+                Cancelable: ${result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:EsCancelable"]["_text"]}
+                Código de Estatus: ${result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:CodigoEstatus"]["_text"]}
+                ${
+			result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"][
+				"a:EsCancelable"
+			]["_text"] !== "Cancelable con aceptación"
+				? `Estatus de Cancelación: ${
+						result["s:Envelope"]["s:Body"]["ConsultaResponse"][
+							"ConsultaResult"
+						]["a:EstatusCancelacion"]["_text"] || "No disponible"
+				  }`
+				: ""
+		}
+            `;
+		document.getElementById("xml-result").textContent =
+			resultadoTexto;
+	} catch (error) {
+		document.getElementById("xml-result").textContent =
+			"Error: " + error.message;
+	}
 }
 
 async function validateFolder() {
@@ -96,7 +139,7 @@ async function validateFolder() {
 		try {
 			const xmlContent = await file.text();
 
-			const response = await fetch("/api/validar-xml", { // Usamos la ruta /api/validar-xml para validar por archivo
+			const response = await fetch("/api/validar-xml", {
 				method: "POST",
 				headers: {
 					"Content-Type": "text/xml", // Tipo de contenido corregido
@@ -104,8 +147,29 @@ async function validateFolder() {
 				body: xmlContent,
 			});
 
+			if (!response.ok) {
+				throw new Error(`Error en la solicitud: ${response.status}`);
+			}
 			const result = await response.json();
-			statusCell.textContent = JSON.stringify(result, null, 2);
+
+			// Mostrar resultado como texto plano
+			const resultadoTexto = `
+                Estado: ${result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:Estado"]["_text"]}
+                Cancelable: ${result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:EsCancelable"]["_text"]}
+                Código de Estatus: ${result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"]["a:CodigoEstatus"]["_text"]}
+                ${
+			result["s:Envelope"]["s:Body"]["ConsultaResponse"]["ConsultaResult"][
+				"a:EsCancelable"
+			]["_text"] !== "Cancelable con aceptación"
+				? `Estatus de Cancelación: ${
+						result["s:Envelope"]["s:Body"]["ConsultaResponse"][
+							"ConsultaResult"
+						]["a:EstatusCancelacion"]["_text"] || "No disponible"
+				  }`
+				: ""
+		}
+            `;
+			statusCell.textContent = resultadoTexto;
 		} catch (error) {
 			statusCell.textContent = "Error: " + error.message;
 		}
