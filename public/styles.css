@@ -1,34 +1,4 @@
 /* Estilos para el modo claro por defecto */
-@font-face {
-  font-family: 'Roboto';
-  src: url('/fonts/Roboto-Regular.ttf') format('truetype');
-  font-weight: 400; /* Peso regular */
-  font-style: normal; /* Estilo normal */
-}
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('/fonts/Roboto-Bold.ttf') format('truetype');
-  font-weight: 700; /* Peso bold */
-  font-style: normal; /* Estilo normal */
-}
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('/fonts/Roboto-Italic.ttf') format('truetype');
-  font-weight: 400; /* Peso regular */
-  font-style: italic; /* Estilo itálico */
-}
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('/fonts/Roboto-BoldItalic.ttf') format('truetype');
-  font-weight: 700; /* Peso bold */
-  font-style: italic; /* Estilo itálico */
-}
-
-/* Otros pesos y estilos de Roboto según sea necesario */
-
 body {
   font-family: 'Roboto', sans-serif; /* Aplicar la fuente Roboto */
   background-color: #ffffff; /* Color de fondo por defecto */
@@ -37,8 +7,7 @@ body {
 }
 
 h1, h2 {
-  font-family: 'Roboto', sans-serif; /* Aplicar la fuente Roboto a títulos */
-  color: #333333; /* Color de los títulos */
+  color: #333333;
 }
 
 nav button {
@@ -49,6 +18,7 @@ nav button {
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease; /* Transición suave */
+  border-radius: 4px;
 }
 
 nav button:hover {
@@ -69,6 +39,8 @@ input {
   margin-bottom: 10px;
   width: 100%;
   box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 button {
@@ -78,6 +50,7 @@ button {
   border: none;
   cursor: pointer;
   transition: background-color 0.3s ease; /* Transición suave */
+  border-radius: 4px;
 }
 
 button:hover {
@@ -125,20 +98,36 @@ th {
 /* Estilos específicos para el icono de modo oscuro */
 body.dark-mode #sun-path {
   fill: #f5f5f5; /* Color del sol en modo oscuro */
+  display: block; /* Mostrar el sol en modo oscuro */
 }
 
 body.dark-mode #moon-path {
-  fill: #333333; /* Color de la luna en modo oscuro */
+  display: none; /* Ocultar la luna en modo oscuro */
+}
+
+/* Estilos específicos para el icono de modo claro */
+body:not(.dark-mode) #sun-path {
+  display: none; /* Ocultar el sol en modo claro */
+}
+
+body:not(.dark-mode) #moon-path {
+  fill: #333333; /* Color de la luna en modo claro */
+  display: block; /* Mostrar la luna en modo claro */
+}
+
+/* Estilos para el modo oscuro */
+body.dark-mode {
+  background-color: #121212;
+  color: #f5f5f5;
 }
 
 body.dark-mode h1, body.dark-mode h2 {
-  color: #dddddd; /* Color de los títulos en modo oscuro */
+  color: #dddddd;
 }
 
 body.dark-mode nav button {
   background-color: #1e1e1e;
   color: #f5f5f5;
-  border-radius: 4px;
 }
 
 body.dark-mode nav button:hover {
@@ -156,11 +145,10 @@ body.dark-mode th {
 body.dark-mode input, body.dark-mode button {
   background-color: #333333;
   color: #f5f5f5;
-  border-radius: 4px;
 }
 
 body.dark-mode input::placeholder {
-  color: #dddddd; /* Color del placeholder en modo oscuro */
+  color: #dddddd;
 }
 
 body.dark-mode button:hover {
